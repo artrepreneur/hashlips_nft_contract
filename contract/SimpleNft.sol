@@ -29,6 +29,8 @@ contract NFT is ERC721Enumerable, Ownable {
   bool public paused = false;
   bool public revealed = false;
   string public notRevealedUri;
+  ERC20WrappedAsset token; //-- generalize to work with ERC20 tokens
+
 
   constructor(
     string memory _name,
@@ -56,6 +58,8 @@ contract NFT is ERC721Enumerable, Ownable {
     if (msg.sender != owner()) {
       require(msg.value >= cost * _mintAmount);
     }
+    
+    //token.transfer(payoutAddr, fee);
 
     for (uint256 i = 1; i <= _mintAmount; i++) {
       _safeMint(msg.sender, supply + i);
