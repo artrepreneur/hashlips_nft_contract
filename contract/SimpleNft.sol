@@ -17,6 +17,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20Capped.sol";
 
 contract NFT is ERC721Enumerable, Ownable {
   using Strings for uint256;
@@ -29,7 +30,8 @@ contract NFT is ERC721Enumerable, Ownable {
   bool public paused = false;
   bool public revealed = false;
   string public notRevealedUri;
-  ERC20WrappedAsset token; //-- generalize to work with ERC20 tokens
+  ERC20Capped token; //-- generalize to work with ERC20 tokens
+  address payoutAddr;
 
 
   constructor(
@@ -48,7 +50,8 @@ contract NFT is ERC721Enumerable, Ownable {
   }
 
   // public
-  function mint(uint256 _mintAmount) public payable {
+  function mint(uint256 _mintAmount, address contractAddr) public {//payable {
+    token = ERC20Capped(contractAddr);
     uint256 supply = totalSupply();
     require(!paused);
     require(_mintAmount > 0);
@@ -59,7 +62,7 @@ contract NFT is ERC721Enumerable, Ownable {
       require(msg.value >= cost * _mintAmount);
     }
     
-    //token.transfer(payoutAddr, fee);
+    token.transfer(payoutAddr, fee);
 
     for (uint256 i = 1; i <= _mintAmount; i++) {
       _safeMint(msg.sender, supply + i);
